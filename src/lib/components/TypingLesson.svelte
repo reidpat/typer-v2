@@ -1,21 +1,20 @@
 <script>
     import { onMount } from "svelte";
 
-    let characters = [];
-    let wordBoundaries = []; // Stores the index where each word starts
-    let nextLetter = "";
-    let key = "";
-    let charIndex = 0;
-    let selection = "prose";
-    export let lessonContent = "Content"
+    let characters = $state([]);
+    let wordBoundaries = $state([]); // Stores the index where each word starts
+    let nextLetter = $state("");
+    let key = $state("");
+    let charIndex = $state(0);
+    let selection = $state("prose");
+    let { lessonContent = "Content", handleWrongKey = $bindable() } = $props();
 
     async function resetWords() {
         if (selection == "prose") {
             const res = {
-               author: "Reid",
+                author: "Reid",
             };
             let rawWords = lessonContent.split(" ");
-            characters = [];
             wordBoundaries = [0];
 
             // Insert words and spaces as separate "words"
@@ -69,6 +68,7 @@
             }
         } else {
             // On mistake, go back to the start of the current word
+            handleWrongKey(nextLetter);
             charIndex = getCurrentWordStart();
             nextLetter = characters[charIndex];
         }
@@ -98,16 +98,30 @@
 <div class="typing-wrapper">
     <div class="text-wrapper">
         <div class="text-content">
-            {#each characters as char, i}
-                {#if i < charIndex}
-                    <span class="complete-text">{char}</span>
-                {:else if i == charIndex}
-                    <span id="next-letter" class="next-letter blink-me"
-                        >{nextLetter}</span
-                    >
-                {:else}
-                    <span class="incomplete-text">{char}</span>
-                {/if}
+            {#each wordBoundaries as boundary, wordIdx}
+                {@const nextBoundary =
+                    wordBoundaries[wordIdx + 1] || characters.length}
+                {@const wordChars = characters.slice(boundary, nextBoundary)}
+                {@const isSpace =
+                    wordChars.length === 1 && wordChars[0] === " "}
+                <span class="word {isSpace ? 'space' : ''}">
+                    {#each wordChars as char, i}
+                        {@const absoluteIndex = boundary + i}
+                        {#if absoluteIndex < charIndex}
+                            <span class="complete-text"
+                                >{isSpace ? "\u00A0" : char}</span
+                            >
+                        {:else if absoluteIndex == charIndex}
+                            <span id="next-letter" class="next-letter blink-me"
+                                >{isSpace ? "\u00A0" : nextLetter}</span
+                            >
+                        {:else}
+                            <span class="incomplete-text"
+                                >{isSpace ? "\u00A0" : char}</span
+                            >
+                        {/if}
+                    {/each}
+                </span>
             {/each}
         </div>
     </div>
@@ -126,6 +140,13 @@
         padding: 20px;
         padding-top: 20px;
         margin-top: 0px;
+    }
+    .word {
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .space {
+        white-space: pre;
     }
     .text-wrapper {
         padding: 2rem;
@@ -149,11 +170,6 @@
         min-width: 0.5em;
         line-height: 0.99;
         box-sizing: border-box;
-    }
-    .author {
-        margin-top: 1rem;
-        font-style: italic;
-        font-size: 1.2rem;
     }
     .blink-me {
         animation: blinker 0.7s step-end 0s infinite;
