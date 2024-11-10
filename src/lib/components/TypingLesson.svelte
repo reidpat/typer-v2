@@ -7,13 +7,32 @@
     let key = $state("");
     let charIndex = $state(0);
     let selection = $state("prose");
-    let { lessonContent = "Content", handleWrongKey = $bindable() } = $props();
+    let {
+        lessonContent = $bindable(),
+        handleWrongKey = $bindable(),
+        newLesson,
+    } = $props();
+
+    function filterToKeyboardChars(inputString) {
+        // Define the regex pattern for allowed characters
+        // This includes:
+        // - All basic ASCII letters (a-z, A-Z)
+        // - Numbers (0-9)
+        // - Common punctuation and symbols found on English keyboards
+        // - Space and newline characters
+        const keyboardCharsPattern =
+            /^[a-zA-Z0-9\s`~!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?\n]+$/;
+
+        // Filter the string character by character
+        return inputString
+            .split("")
+            .filter((char) => keyboardCharsPattern.test(char))
+            .join("");
+    }
 
     async function resetWords() {
         if (selection == "prose") {
-            const res = {
-                author: "Reid",
-            };
+            lessonContent = filterToKeyboardChars(lessonContent);
             let rawWords = lessonContent.split(" ");
             wordBoundaries = [0];
 
@@ -51,7 +70,8 @@
 
     function handleCharacter() {
         if (key == "Escape") {
-            resetWords();
+            lessonContent = null;
+            newLesson();
         } else if (
             key == nextLetter ||
             (key == "Enter" && nextLetter == "Enter\r") ||
@@ -62,7 +82,8 @@
             charIndex++;
 
             if (charIndex >= characters.length) {
-                resetWords();
+                lessonContent = null;
+                newLesson();
             } else {
                 nextLetter = characters[charIndex];
             }
