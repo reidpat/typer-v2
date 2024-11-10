@@ -9,7 +9,6 @@
     let selection = $state("prose");
     let {
         lessonContent = $bindable(),
-        handleWrongKey = $bindable(),
         newLesson,
         wpm = $bindable(),
         errors = $bindable(),
@@ -71,31 +70,28 @@
         resetWords();
     });
 
-    let startTime = $state()
-    let endTime = $state()
+    let startTime = $state();
+    let endTime = $state();
 
     async function computeWPM() {
         if (charIndex == 1) {
             startTime = Date.now() - 1;
         }
-		endTime = Date.now();
-		let totalTime = (endTime - startTime) / 1000 / 60;
-		let totalWords =  charIndex / 5;
-		wpm = (totalWords / totalTime).toFixed(2).padStart(5, '0');
-		// let _avg_wpm = avg_wpm + Math.round(((wpm - avg_wpm) / total) * 100) / 100;
-		// _avg_wpm = Math.round(avg_wpm * 100) / 100;
-		// accuracy = Math.round(((totalTyped - attempts) / totalTyped) * 100) / 100;
-		// console.log('total ', totalTyped, 'mistakes ', attempts);
-		// console.log('accuracy', accuracy);
+        endTime = Date.now();
+        let totalTime = (endTime - startTime) / 1000 / 60;
+        let totalWords = charIndex / 5;
+        wpm = (totalWords / totalTime).toFixed(2).padStart(5, "0");
+        // let _avg_wpm = avg_wpm + Math.round(((wpm - avg_wpm) / total) * 100) / 100;
+        // _avg_wpm = Math.round(avg_wpm * 100) / 100;
+        // accuracy = Math.round(((totalTyped - attempts) / totalTyped) * 100) / 100;
+        // console.log('total ', totalTyped, 'mistakes ', attempts);
+        // console.log('accuracy', accuracy);
 
-		// updateWPM(wpm, _avg_wpm, accuracy);
-	}
+        // updateWPM(wpm, _avg_wpm, accuracy);
+    }
 
     function handleCharacter() {
-        if (key == "Escape") {
-            lessonContent = null;
-            newLesson();
-        } else if (
+        if (
             key == nextLetter ||
             (key == "Enter" && nextLetter == "Enter\r") ||
             (key == "-" && nextLetter == "—") ||
@@ -121,13 +117,11 @@
 
     function handleKeydown(event) {
         key = event.key;
-
-        if (key != "Shift" && key != "Alt") {
-            if (selection == "prose") {
-                handleCharacter();
-            } else {
-                letterEquals();
-            }
+        if (key == "Escape") {
+            lessonContent = null;
+            newLesson();
+        } else if (key != "Shift" && key != "Alt") {
+            handleCharacter();
             resetBlink();
         }
     }
