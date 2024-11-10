@@ -7,10 +7,12 @@
     let generalInstructions =
         " It should only contain characters found on the english keyboard";
 
+    let loading = $state(false);
     async function generate() {
+        loading = true;
         console.log(focus);
         let prompt;
-        let maxTokens = 100
+        let maxTokens = 100;
         if (focus.length > 1) {
             maxTokens = 30;
             prompt = `Generate a typing test for the user which focus on building skill with the ${focus} keys. The test should be in the form of full words, but need not be full sentences, or make sense. It should not include commas between each word. Your response should only contain the test, with no other words or characters`;
@@ -38,6 +40,7 @@
         });
         let data = await res.json();
         content = data.choices[0].message.content;
+        loading = false;
         console.log(data);
     }
 
@@ -47,3 +50,10 @@
         generateNew = async () => await generate();
     });
 </script>
+
+{#if loading}
+    <div class="w-4/5 m-auto flex flex-col justify-center items-center gap-2 p-4">
+        <div class="skeleton h-6 w-full"></div>
+        <div class="skeleton h-6 w-full"></div>
+    </div>
+{/if}
