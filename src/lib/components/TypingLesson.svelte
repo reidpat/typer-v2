@@ -11,6 +11,8 @@
         lessonContent = $bindable(),
         handleWrongKey = $bindable(),
         newLesson,
+        wpm = $bindable(),
+        errors = $bindable(),
     } = $props();
 
     function filterToKeyboardChars(inputString) {
@@ -31,6 +33,7 @@
     }
 
     async function resetWords() {
+        startTime = Date.now();
         if (selection == "prose") {
             lessonContent = filterToKeyboardChars(lessonContent);
             let rawWords = lessonContent.split(" ");
@@ -68,6 +71,26 @@
         resetWords();
     });
 
+    let startTime = $state()
+    let endTime = $state()
+
+    async function computeWPM() {
+        if (charIndex == 1) {
+            startTime = Date.now() - 1;
+        }
+		endTime = Date.now();
+		let totalTime = (endTime - startTime) / 1000 / 60;
+		let totalWords =  charIndex / 5;
+		wpm = (totalWords / totalTime).toFixed(2).padStart(5, '0');
+		// let _avg_wpm = avg_wpm + Math.round(((wpm - avg_wpm) / total) * 100) / 100;
+		// _avg_wpm = Math.round(avg_wpm * 100) / 100;
+		// accuracy = Math.round(((totalTyped - attempts) / totalTyped) * 100) / 100;
+		// console.log('total ', totalTyped, 'mistakes ', attempts);
+		// console.log('accuracy', accuracy);
+
+		// updateWPM(wpm, _avg_wpm, accuracy);
+	}
+
     function handleCharacter() {
         if (key == "Escape") {
             lessonContent = null;
@@ -89,10 +112,11 @@
             }
         } else {
             // On mistake, go back to the start of the current word
-            handleWrongKey(nextLetter);
+            errors.push(nextLetter);
             charIndex = getCurrentWordStart();
             nextLetter = characters[charIndex];
         }
+        computeWPM();
     }
 
     function handleKeydown(event) {
@@ -157,7 +181,7 @@
     .typing-wrapper {
         margin: auto;
         width: 80%;
-        max-width: 800px;
+        max-width: 1200px;
         padding: 20px;
         padding-top: 20px;
         margin-top: 0px;
