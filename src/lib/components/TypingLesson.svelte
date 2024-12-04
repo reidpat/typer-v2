@@ -12,7 +12,10 @@
         newLesson,
         wpm = $bindable(),
         errors = $bindable(),
+        accuracy = $bindable()
     } = $props();
+
+    
 
     function filterToKeyboardChars(inputString) {
         // Define the regex pattern for allowed characters
@@ -86,6 +89,7 @@
         // accuracy = Math.round(((totalTyped - attempts) / totalTyped) * 100) / 100;
         // console.log('total ', totalTyped, 'mistakes ', attempts);
         // console.log('accuracy', accuracy);
+        if(charIndex > 0 && charIndex < characters.length) accuracy = ((charIndex - errors.length) / charIndex * 100).toFixed(1);
 
         // updateWPM(wpm, _avg_wpm, accuracy);
     }
@@ -118,6 +122,8 @@
     function handleKeydown(event) {
         key = event.key;
         if (key == "Escape") {
+            accuracy = 0
+            errors = []
             lessonContent = null;
             newLesson();
         } else if (key != "Shift" && key != "Alt") {

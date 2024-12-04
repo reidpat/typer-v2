@@ -1,0 +1,15 @@
+[
+    {
+        "keyboard": "svalboard",
+        "fingers": {
+            "left_pinky": ["`","a",";"],
+            "left_ring": [",","x","o","q"],
+            "left_middle": ["`",".","y","j","e"],
+            "left_index": ["p","i","k","u"],
+            "right_index": ["d","g","'","m","h"],
+            "right_middle": ["f","c","-","w","t"],
+            "right_ring": ["b","r","v","n"],
+            "right_pinky": ["/","l",";","z","s"]
+        }
+    }
+]
